@@ -1,0 +1,404 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                     APPLICATION DE CHAT UDP                                ║
+║                        GUIDE DE RÉFÉRENCE RAPIDE                           ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════
+  LANCEMENT RAPIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+  1. DÉMARRER LE SERVEUR
+     • Double-cliquer sur: run-udp-server.bat
+     • Ou via CMD: java -cp "target\classes" udp.UDPServerGUI
+     • Configurer le port (défaut: 6000)
+     • Cliquer sur "Démarrer"
+
+  2. DÉMARRER LES CLIENTS (plusieurs instances)
+     • Double-cliquer sur: run-udp-client.bat (pour chaque client)
+     • Ou via CMD: java -cp "target\classes" udp.UDPClientGUI
+     • Entrer un pseudo unique
+     • Entrer l'adresse du serveur (localhost en local)
+     • Entrer le port du serveur (6000)
+     • Cliquer sur "Connecter"
+
+  3. TESTER
+     • Envoyer un message broadcast: sélectionner "Tous"
+     • Envoyer un message privé: sélectionner un pseudo
+     • Envoyer une image: cliquer sur "📎 Image / Fichier"
+     • Rafraîchir la liste: cliquer sur "🔄"
+
+═══════════════════════════════════════════════════════════════════════════════
+  STRUCTURE DES FICHIERS
+═══════════════════════════════════════════════════════════════════════════════
+
+  src/main/java/udp/
+  ├── Message.java              → Classe de message sérialisable
+  ├── UDPClientGUI.java         → Interface client UDP
+  └── UDPServerGUI.java         → Interface serveur UDP
+
+  Scripts de lancement:
+  ├── run-udp-server.bat        → Lance le serveur
+  └── run-udp-client.bat        → Lance un client
+
+  Documentation:
+  └── UDP_README.md             → Documentation complète
+
+═══════════════════════════════════════════════════════════════════════════════
+  CLASSES PRINCIPALES
+═══════════════════════════════════════════════════════════════════════════════
+
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │ MESSAGE.JAVA - Encapsulation des données                                │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ Types de messages:                                                       │
+  │   • TEXTE   → Message de chat textuel                                    │
+  │   • FICHIER → Transfert de fichier/image                                 │
+  │   • LISTE   → Liste des clients connectés                                │
+  │                                                                          │
+  │ Attributs principaux:                                                    │
+  │   • Type type          - Type du message                                 │
+  │   • String sender      - Pseudo de l'émetteur                            │
+  │   • String target      - Pseudo du destinataire ("Tous" = broadcast)     │
+  │   • String text        - Contenu textuel                                 │
+  │   • String filename    - Nom du fichier (pour FICHIER)                   │
+  │   • byte[] fileBytes   - Données du fichier (pour FICHIER)               │
+  │                                                                          │
+  │ Méthodes clés:                                                           │
+  │   • byte[] toBytes()                  - Sérialise le message             │
+  │   • Message.fromBytes(byte[])         - Désérialise le message           │
+  │   • toString()                        - Représentation textuelle         │
+  └──────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │ UDPCLIENTGUI.JAVA - Interface client                                     │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ Composants réseau:                                                       │
+  │   • DatagramSocket socket           - Socket UDP du client               │
+  │   • InetAddress serverAddress       - Adresse IP du serveur              │
+  │   • Thread listenerThread           - Thread d'écoute des messages       │
+  │                                                                          │
+  │ Fonctionnalités:                                                         │
+  │   • Connexion au serveur avec pseudo                                     │
+  │   • Envoi de messages texte (broadcast ou privé)                         │
+  │   • Envoi de fichiers/images                                             │
+  │   • Réception et affichage des messages                                  │
+  │   • Affichage inline des images                                          │
+  │   • Liste dynamique des destinataires                                    │
+  │                                                                          │
+  │ Méthodes principales:                                                    │
+  │   • connect()           - Se connecte au serveur                         │
+  │   • disconnect()        - Se déconnecte du serveur                       │
+  │   • sendText()          - Envoie un message texte                        │
+  │   • sendFile()          - Envoie un fichier/image                        │
+  │   • listenLoop()        - Boucle d'écoute des messages entrants          │
+  │   • requestClientList() - Demande la liste des clients                   │
+  └──────────────────────────────────────────────────────────────────────────┘
+
+  ┌──────────────────────────────────────────────────────────────────────────┐
+  │ UDPSERVERGUI.JAVA - Serveur de routage                                   │
+  ├──────────────────────────────────────────────────────────────────────────┤
+  │ Composants réseau:                                                       │
+  │   • DatagramSocket socket                     - Socket UDP serveur       │
+  │   • ConcurrentHashMap<String, ClientInfo>     - Table des clients        │
+  │   • Thread serverThread                       - Thread d'écoute          │
+  │                                                                          │
+  │ Fonctionnalités:                                                         │
+  │   • Écoute sur un port UDP configurable                                  │
+  │   • Enregistrement des clients (pseudo → IP:port)                        │
+  │   • Routage des messages:                                                │
+  │     - Broadcast: vers tous sauf émetteur                                 │
+  │     - Unicast: vers client spécifique                                    │
+  │   • Envoi de la liste des clients                                        │
+  │   • Logs détaillés et compteur de clients                                │
+  │                                                                          │
+  │ Méthodes principales:                                                    │
+  │   • startServer()        - Démarre le serveur                            │
+  │   • stopServer()         - Arrête le serveur                             │
+  │   • serverLoop()         - Boucle de réception des messages              │
+  │   • registerClient()     - Enregistre un client                          │
+  │   • broadcastMessage()   - Diffuse à tous les clients                    │
+  │   • unicastMessage()     - Envoie à un client spécifique                 │
+  │   • handleListRequest()  - Traite une demande de liste                   │
+  └──────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+  PROTOCOLE DE COMMUNICATION
+═══════════════════════════════════════════════════════════════════════════════
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ FLUX: ENVOI D'UN MESSAGE TEXTE                                          │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+    CLIENT                          SERVEUR                       DESTINATAIRE
+      │                                │                                │
+      │ 1. Créer Message               │                                │
+      │    (TEXTE, "Alice",            │                                │
+      │     "Bob", "Salut!")           │                                │
+      │                                │                                │
+      │ 2. msg.toBytes()               │                                │
+      │    [sérialisation]             │                                │
+      │                                │                                │
+      │ 3. DatagramPacket              │                                │
+      ├───────────────────────────────►│                                │
+      │    UDP → serverAddress:port    │                                │
+      │                                │                                │
+      │                                │ 4. Message.fromBytes()         │
+      │                                │    [désérialisation]           │
+      │                                │                                │
+      │                                │ 5. Identifier destinataire     │
+      │                                │    target = "Bob"              │
+      │                                │                                │
+      │                                │ 6. clients.get("Bob")          │
+      │                                │    → ClientInfo(IP, port)      │
+      │                                │                                │
+      │                                │ 7. DatagramPacket              │
+      │                                ├───────────────────────────────►│
+      │                                │    UDP → Bob's IP:port         │
+      │                                │                                │
+      │                                │                                │ 8. Afficher
+      │                                │                                │    "Alice → Bob: Salut!"
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ FLUX: BROADCAST D'UN MESSAGE                                            │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+    CLIENT ALICE                    SERVEUR                     AUTRES CLIENTS
+      │                                │                                │
+      │ Message(TEXTE, "Alice",        │                                │
+      │         "Tous", "Hello!")      │                                │
+      ├───────────────────────────────►│                                │
+      │                                │                                │
+      │                                │ Pour chaque client             │
+      │                                │ (sauf "Alice"):                │
+      │                                ├───────────────────────────────►│ Bob
+      │                                │                                │
+      │                                ├───────────────────────────────►│ Charlie
+      │                                │                                │
+      │                                ├───────────────────────────────►│ David
+      │                                │                                │
+      │                                │                     Tous reçoivent:
+      │                                │                     "Alice : Hello!"
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ FLUX: DEMANDE DE LISTE DES CLIENTS                                      │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+    CLIENT                          SERVEUR
+      │                                │
+      │ 1. Cliquer sur 🔄             │
+      │                                │
+      │ 2. Message(LISTE, "Alice",     │
+      │            null, null)         │
+      ├───────────────────────────────►│
+      │                                │
+      │                                │ 3. clients.keySet()
+      │                                │    → ["Alice", "Bob", "Charlie"]
+      │                                │
+      │                                │ 4. String list = "Alice\nBob\nCharlie"
+      │                                │
+      │                                │ 5. Message(LISTE, "Serveur",
+      │                                │            "Alice", list)
+      │◄───────────────────────────────┤
+      │                                │
+      │ 6. Mise à jour de la           │
+      │    liste déroulante            │
+      │    ┌──────────────┐            │
+      │    │ Tous         │            │
+      │    │ Bob          │            │
+      │    │ Charlie      │            │
+      │    └──────────────┘            │
+
+═══════════════════════════════════════════════════════════════════════════════
+  SÉRIALISATION JAVA
+═══════════════════════════════════════════════════════════════════════════════
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ CONVERSION OBJET → BYTES (toBytes)                                      │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+    Message msg = new Message(Type.TEXTE, "Alice", "Bob", "Salut");
+
+    ┌──────────────────┐
+    │ ByteArrayOutputStream  → Buffer mémoire pour accumuler les bytes
+    └──────────────────┘
+            ↓
+    ┌──────────────────┐
+    │ ObjectOutputStream     → Écrit des objets Java dans le flux
+    └──────────────────┘
+            ↓
+    oos.writeObject(msg);      → Écrit l'objet Message complet
+            ↓
+    byte[] data = bos.toByteArray();  → Récupère le tableau de bytes
+
+    Résultat: [0xAC, 0xED, 0x00, 0x05, ...] (format binaire Java)
+
+  ┌─────────────────────────────────────────────────────────────────────────┐
+  │ CONVERSION BYTES → OBJET (fromBytes)                                    │
+  └─────────────────────────────────────────────────────────────────────────┘
+
+    byte[] data = packet.getData();
+
+    ┌──────────────────┐
+    │ ByteArrayInputStream   → Lit depuis un tableau de bytes
+    └──────────────────┘
+            ↓
+    ┌──────────────────┐
+    │ ObjectInputStream      → Lit des objets Java depuis le flux
+    └──────────────────┘
+            ↓
+    Object obj = ois.readObject();  → Reconstruit l'objet
+            ↓
+    Message msg = (Message) obj;    → Cast vers Message
+
+    Résultat: Objet Message complet avec tous ses attributs
+
+═══════════════════════════════════════════════════════════════════════════════
+  COMPARAISON: UDP vs TCP vs MULTICAST
+═══════════════════════════════════════════════════════════════════════════════
+
+  ┌────────────────┬─────────────────────┬─────────────────────┬─────────────────┐
+  │ CRITÈRE        │ UDP (cette app)     │ TCP                 │ MULTICAST       │
+  ├────────────────┼─────────────────────┼─────────────────────┼─────────────────┤
+  │ Connexion      │ Sans connexion      │ Avec connexion      │ Sans connexion  │
+  │ Fiabilité      │ Non garanti         │ Garanti             │ Non garanti     │
+  │ Ordre          │ Non garanti         │ Garanti             │ Non garanti     │
+  │ Vitesse        │ Rapide ⚡           │ Moyenne             │ Très rapide ⚡⚡ │
+  │ Overhead       │ 8 bytes header      │ 20+ bytes header    │ 8 bytes header  │
+  │ Architecture   │ Client-Serveur      │ Client-Serveur/P2P  │ Groupe distribué│
+  │ Routage        │ Via serveur central │ Point-à-point       │ Diffusion groupe│
+  │ Scalabilité    │ Moyenne (table)     │ Faible (1 sock/cli) │ Excellente      │
+  │ Complexité     │ Moyenne             │ Élevée (threads)    │ Faible          │
+  │ Taille max     │ ~32 Ko pratique     │ Illimité            │ ~32 Ko pratique │
+  └────────────────┴─────────────────────┴─────────────────────┴─────────────────┘
+
+  QUAND UTILISER:
+
+    UDP ✅
+      • Chat temps réel (latence critique)
+      • Jeux vidéo multijoueur
+      • Streaming audio/vidéo
+      • Communication légère et rapide
+      • Perte de message acceptable
+
+    TCP ✅
+      • Transferts de fichiers volumineux
+      • Transactions critiques
+      • APIs REST
+      • Toute communication fiable
+
+    MULTICAST ✅
+      • Diffusion à grande échelle
+      • Streaming en direct (IPTV)
+      • Pas besoin de serveur central
+      • Applications distribuées
+
+═══════════════════════════════════════════════════════════════════════════════
+  LIMITATIONS UDP
+═══════════════════════════════════════════════════════════════════════════════
+
+  ⚠️  TAILLE DES PAQUETS
+      • Maximum théorique: 65 535 bytes (65 Ko)
+      • Maximum pratique: 8 192 - 32 768 bytes (8-32 Ko)
+      • Recommandation: Limiter fichiers à 32 Ko
+      • Au-delà: risque de fragmentation IP et perte
+
+  ⚠️  PERTE DE PAQUETS
+      • UDP ne garantit PAS la livraison
+      • En réseau local: perte rare (<0.1%)
+      • En réseau distant/WiFi: perte plus fréquente
+      • Solution: Implémenter ACK + retransmission
+
+  ⚠️  ORDRE DES MESSAGES
+      • Les paquets peuvent arriver dans le désordre
+      • Implémentation actuelle: pas de numérotation
+      • Solution: Ajouter numéro de séquence
+
+  ⚠️  SÉCURITÉ
+      • Messages en clair (non chiffrés)
+      • Risque d'interception
+      • Solution: Implémenter DTLS (TLS pour UDP)
+
+═══════════════════════════════════════════════════════════════════════════════
+  DÉPANNAGE RAPIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+  ❌ ERREUR: "Port already in use"
+     ✅ Solution: Changer le port (ex: 6001) ou arrêter l'autre programme
+        CMD: netstat -ano | findstr :6000
+             taskkill /PID <PID> /F
+
+  ❌ ERREUR: "Serveur introuvable"
+     ✅ Solution:
+        1. Vérifier serveur démarré
+        2. Vérifier adresse IP (localhost / 127.0.0.1 en local)
+        3. Vérifier firewall Windows
+
+  ❌ ERREUR: Messages non reçus
+     ✅ Solution: Autoriser Java dans le firewall
+        1. Windows Defender Firewall
+        2. "Autoriser une application"
+        3. Ajouter javaw.exe
+        4. Autoriser réseau privé ET public
+
+  ❌ ERREUR: Images non affichées
+     ✅ Solution:
+        1. Utiliser PNG, JPG, GIF
+        2. Vérifier taille < 32 Ko
+        3. Consulter logs pour détails
+
+  ❌ ERREUR: ClassNotFoundException
+     ✅ Solution: Recompiler le projet
+        CMD: mvn clean compile
+
+═══════════════════════════════════════════════════════════════════════════════
+  COMMANDES UTILES
+═══════════════════════════════════════════════════════════════════════════════
+
+  • Compiler le projet:
+    mvn clean compile
+
+  • Lancer le serveur:
+    java -cp "target\classes" udp.UDPServerGUI
+
+  • Lancer un client:
+    java -cp "target\classes" udp.UDPClientGUI
+
+  • Vérifier port utilisé:
+    netstat -ano | findstr :6000
+
+  • Obtenir son IP locale:
+    ipconfig
+
+  • Tester connectivité réseau:
+    ping <adresse_serveur>
+
+═══════════════════════════════════════════════════════════════════════════════
+  NOTES IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════════
+
+  📌 THREAD SAFETY
+     • Le serveur utilise ConcurrentHashMap pour la table des clients
+     • Thread-safe: pas de ConcurrentModificationException
+     • Opérations atomiques (put, get, remove)
+
+  📌 SÉRIALISATION
+     • Format binaire propriétaire Java
+     • Pas compatible avec autres langages
+     • Alternative: JSON avec Gson/Jackson
+
+  📌 GESTION MÉMOIRE
+     • Buffer de 65 Ko par socket
+     • Attention aux fichiers volumineux en RAM
+     • Pas de streaming: fichier chargé entièrement
+
+  📌 PSEUDO UNIQUE
+     • Le serveur identifie les clients par pseudo
+     • Deux clients avec même pseudo: écrasement dans la table
+     • Recommandation: Valider unicité côté serveur
+
+═══════════════════════════════════════════════════════════════════════════════
+
+  Pour plus d'informations, consulter: UDP_README.md
+
+═══════════════════════════════════════════════════════════════════════════════
+
