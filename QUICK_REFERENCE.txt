@@ -1,0 +1,140 @@
+╔══════════════════════════════════════════════════════════════╗
+║          MULTICAST IMAGE CHAT - QUICK REFERENCE              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📁 PROJECT FILES:
+   ✅ multicast.MulticastConfig.java      - Settings (address, port, buffer)
+   ✅ multicast.MulticastMessage.java     - Message protocol (TEXT/IMAGE)
+   ✅ multicast.MulticastSender.java      - Send text & images
+   ✅ multicast.MulticastReceiver.java    - Receive & display in chat
+
+═══════════════════════════════════════════════════════════════
+
+🚀 HOW TO RUN:
+
+   1. SENDER:     run-sender.bat
+   2. RECEIVERS:  run-receiver.bat (run multiple times!)
+   3. Click "Start Listening" on each receiver
+   4. Send messages and images from sender
+
+═══════════════════════════════════════════════════════════════
+
+📤 SENDER - HOW TO SEND:
+
+   TEXT:
+   └─► Type in text area → Click "📤 Send Text Message"
+
+   IMAGE:
+   └─► Click "🖼️ Select Image" → Choose file → "📸 Send Image"
+
+   Supported: JPG, PNG, GIF (max 5 MB)
+
+═══════════════════════════════════════════════════════════════
+
+📥 RECEIVER - WHAT YOU SEE:
+
+   📝 TEXT MESSAGE (Blue border)
+   ┌────────────────────────────┐
+   │ 📝 Text Message #1         │
+   │ From: 192.168.1.5          │
+   │ Time: 14:30:25             │
+   │                            │
+   │ Hello everyone!            │
+   └────────────────────────────┘
+
+   🖼️ IMAGE MESSAGE (Pink border)
+   ┌────────────────────────────┐
+   │ 🖼️ Image Message #2        │
+   │ From: 192.168.1.5          │
+   │ Time: 14:30:30             │
+   │                            │
+   │   [IMAGE PREVIEW]          │
+   │   Click to view full size  │
+   └────────────────────────────┘
+
+   ⚠️ SYSTEM MESSAGE (Yellow)
+   └─► Join/leave notifications
+
+═══════════════════════════════════════════════════════════════
+
+⌨️ KEYBOARD SHORTCUTS:
+
+   Sender: Ctrl+Enter = Send text message
+
+═══════════════════════════════════════════════════════════════
+
+🎨 UI FEATURES:
+
+   SENDER:
+   ├─ Left panel:  Text message input
+   ├─ Right panel: Image selection & preview
+   └─ Bottom:      Activity log
+
+   RECEIVER:
+   ├─ Center: Chat panel (messages + images)
+   ├─ Left:   Connection info & status
+   └─ Bottom: Control buttons (Start/Stop/Clear)
+
+═══════════════════════════════════════════════════════════════
+
+🔧 TECHNICAL SPECS:
+
+   Multicast Address: 230.0.0.1
+   Port:             4446
+   Buffer Size:      65,000 bytes
+   Max Image:        5 MB
+   Protocol:         UDP Multicast
+   Serialization:    Java Object Serialization
+
+═══════════════════════════════════════════════════════════════
+
+💡 TIPS:
+
+   ✓ Run 3-4 receivers to see multicast in action
+   ✓ Send text first, then try an image
+   ✓ Click images to view full resolution
+   ✓ Compress large images for better performance
+   ✓ All receivers MUST click "Start Listening"
+
+═══════════════════════════════════════════════════════════════
+
+⚠️ TROUBLESHOOTING:
+
+   Problem: No messages received
+   └─► Check firewall, ensure all on same network
+
+   Problem: Image too large
+   └─► Reduce size or compress (max 5 MB)
+
+   Problem: Won't compile
+   └─► Run: mvn clean compile
+
+   Problem: Multiple instances in IntelliJ
+   └─► Edit Configuration → Allow multiple instances
+
+═══════════════════════════════════════════════════════════════
+
+🎯 WHAT THIS DEMONSTRATES:
+
+   ✅ Multicast Socket (java.net.MulticastSocket)
+   ✅ One-to-many communication
+   ✅ Object serialization
+   ✅ Image handling (ImageIO, BufferedImage)
+   ✅ Swing GUI programming
+   ✅ Event-driven architecture
+   ✅ Multi-threading
+   ✅ Network programming
+
+═══════════════════════════════════════════════════════════════
+
+📚 MORE INFO:
+
+   README.md          - Full documentation
+   QUICKSTART.md      - Getting started guide
+   IMAGE_FEATURE.md   - Image feature details
+   architecture.html  - Visual guide (open in browser)
+
+═══════════════════════════════════════════════════════════════
+
+Happy multicasting! 🎉
+

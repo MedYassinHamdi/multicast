@@ -2,8 +2,8 @@
 
 ## Overview
 This is a simple demonstration of how **Java Multicast Sockets** work. The application consists of:
-- **MulticastSender**: GUI application to send messages to all receivers in a multicast group
-- **MulticastReceiver**: GUI application to receive multicast messages
+- **multicast.MulticastSender**: GUI application to send messages to all receivers in a multicast group
+- **multicast.MulticastReceiver**: GUI application to receive multicast messages
 - Multiple receivers can run simultaneously, each with a unique user ID
 
 ## What is Multicast?
@@ -16,14 +16,14 @@ MultiCast/
 ├── src/
 │   └── main/
 │       └── java/
-│           ├── MulticastConfig.java    # Configuration constants
-│           ├── MulticastSender.java    # Sender application with GUI
-│           └── MulticastReceiver.java  # Receiver application with GUI
+│           ├── multicast.MulticastConfig.java    # Configuration constants
+│           ├── multicast.MulticastSender.java    # Sender application with GUI
+│           └── multicast.MulticastReceiver.java  # Receiver application with GUI
 └── README.md
 ```
 
 ## Configuration
-The multicast settings are defined in `MulticastConfig.java`:
+The multicast settings are defined in `multicast.MulticastConfig.java`:
 - **Multicast Address**: 230.0.0.1 (can be any address in range 224.0.0.0-239.255.255.255)
 - **Port**: 4446
 - **Buffer Size**: 1024 bytes
@@ -37,26 +37,26 @@ mvn clean compile
 
 ### Run the Sender
 ```bash
-mvn exec:java -Dexec.mainClass="MulticastSender"
+mvn exec:java -Dexec.mainClass="multicast.MulticastSender"
 ```
 
 Or using Java directly:
 ```bash
 cd target/classes
-java MulticastSender
+java multicast.MulticastSender
 ```
 
 ### Run the Receiver (Multiple Times)
 You can run this as many times as you want - each instance creates a new receiver with a unique ID:
 
 ```bash
-mvn exec:java -Dexec.mainClass="MulticastReceiver"
+mvn exec:java -Dexec.mainClass="multicast.MulticastReceiver"
 ```
 
 Or using Java directly:
 ```bash
 cd target/classes
-java MulticastReceiver
+java multicast.MulticastReceiver
 ```
 
 **Tip**: Run multiple receiver instances to see multicast in action!
@@ -64,14 +64,14 @@ java MulticastReceiver
 ## How to Use
 
 ### Sender Application
-1. Launch the MulticastSender application
+1. Launch the multicast.MulticastSender application
 2. Type your message in the text area
 3. Click "Send to All Receivers" button (or press Ctrl+Enter)
 4. The message will be broadcast to all active receivers
 5. Check the activity log to see sent messages
 
 ### Receiver Application
-1. Launch one or more MulticastReceiver instances
+1. Launch one or more multicast.MulticastReceiver instances
 2. Each receiver gets a unique ID (e.g., Receiver-1234)
 3. Click "🔌 Start Listening" to join the multicast group
 4. The receiver will display all incoming messages with timestamps

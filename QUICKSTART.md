@@ -12,10 +12,10 @@
 mvn clean compile
 
 # Run Sender
-mvn exec:java -Dexec.mainClass="MulticastSender"
+mvn exec:java -Dexec.mainClass="multicast.MulticastSender"
 
 # Run Receiver (in separate terminals, run multiple times)
-mvn exec:java -Dexec.mainClass="MulticastReceiver"
+mvn exec:java -Dexec.mainClass="multicast.MulticastReceiver"
 ```
 
 ### Option 3: Using Java Directly
@@ -25,11 +25,11 @@ mvn clean compile
 
 # Run Sender
 cd target\classes
-java MulticastSender
+java multicast.MulticastSender
 
 # Run Receiver (in separate terminals)
 cd target\classes
-java MulticastReceiver
+java multicast.MulticastReceiver
 ```
 
 ## 📝 Test Scenario
@@ -92,9 +92,9 @@ java MulticastReceiver
 ## 📚 Code Structure
 
 ```
-MulticastConfig.java    → Settings (address: 230.0.0.1, port: 4446)
-MulticastSender.java    → Sends messages using MulticastSocket
-MulticastReceiver.java  → Receives messages using MulticastSocket + joinGroup()
+multicast.MulticastConfig.java    → Settings (address: 230.0.0.1, port: 4446)
+multicast.MulticastSender.java    → Sends messages using MulticastSocket
+multicast.MulticastReceiver.java  → Receives messages using MulticastSocket + joinGroup()
 ```
 
 **Key Java Classes Used:**

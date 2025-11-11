@@ -1,3 +1,5 @@
+package multicast;
+
 /**
  * Configuration constants for the Multicast application
  */
@@ -8,7 +10,10 @@ public class MulticastConfig {
     // Port number for multicast communication
     public static final int PORT = 4446;
 
-    // Maximum packet size
-    public static final int BUFFER_SIZE = 1024;
+    // Maximum packet size (increased for image support)
+    public static final int BUFFER_SIZE = 65000; // Max UDP packet size
+
+    // Maximum image size (in bytes) - 5 MB
+    public static final int MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 }
 
